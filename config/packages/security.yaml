@@ -1,24 +1,52 @@
 security:
+    encoders:
+        # to save password plaintext use this :
+        App\Entity\User: plaintext
+        # use your user class name here
+#        App\Entity\User:
+            # Use native password encoder
+            # This value auto-selects the best possible hashing algorithm
+            # (i.e. Sodium when available).
+#            algorithm: auto
+#            cost: 12
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        users_in_memory: { memory: null }
+        #        users_in_memory: { memory: null }
+        from_database:
+            entity:
+                class: App\Entity\User
+                property: username
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
-            lazy: true
-            provider: users_in_memory
+            anonymous: lazy
+            #            provider: users_in_memory
+            provider: from_database
+            form_login:
+                check_path: login
+                login_path: login
+                default_target_path: home
+            logout:
+                path: logout
+                target: login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
 
+            #            form_login:
+            #                check_path: login
+            #
+            #            logout:
+            #                path: /logout
+            #                target: /
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/home, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
